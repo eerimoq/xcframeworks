@@ -1,0 +1,25 @@
+name: Release libsrt
+
+on:
+  push:
+    tags:
+      - 'libsrt-*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build xcframework
+        working-directory: libsrt
+        run: ./build.sh
+
+      - name: Upload xcframework to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: libsrt/libsrt.xcframework.zip

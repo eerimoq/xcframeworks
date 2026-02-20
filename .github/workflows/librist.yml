@@ -1,0 +1,28 @@
+name: Release librist
+
+on:
+  push:
+    tags:
+      - 'librist-*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: brew install meson ninja
+
+      - name: Build xcframework
+        working-directory: librist
+        run: ./build.sh
+
+      - name: Upload xcframework to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: librist/librist.xcframework.zip

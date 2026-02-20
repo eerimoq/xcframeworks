@@ -1,2 +1,3 @@
 # xcframeworks
-Various Xcode frameworks
+
+Various Xcode frameworks built as XCFrameworks for iOS.

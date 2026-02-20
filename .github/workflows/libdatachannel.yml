@@ -1,0 +1,25 @@
+name: Release libdatachannel
+
+on:
+  push:
+    tags:
+      - 'libdatachannel-*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build xcframework
+        working-directory: libdatachannel
+        run: ./build.sh
+
+      - name: Upload xcframework to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: libdatachannel/libdatachannel.xcframework.zip
