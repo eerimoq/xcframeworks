@@ -51,24 +51,25 @@ function build() {
     build_srt iphonesimulator SIMULATOR64 arm64
     build_srt iphoneos OS arm64
 
-    export MACOSX_DEPLOYMENT_TARGET=10.15
     MACOS_OPENSSL=$(pwd)/OpenSSL/macosx
-    mkdir -p build/macos
-    pushd build/macos
+    mkdir -p build/macos_catalyst
+    pushd build/macos_catalyst
     ../../srt/configure \
         --cmake-osx-architectures=arm64 \
         --cmake-policy-version-minimum=3.5 \
+        --cmake-c-flags="-target arm64-apple-ios16.0-macabi" \
+        --cmake-cxx-flags="-target arm64-apple-ios16.0-macabi" \
         --OPENSSL_INCLUDE_DIR=$MACOS_OPENSSL/include \
         --OPENSSL_LIBRARIES=$MACOS_OPENSSL/lib/libcrypto.a
     make -j $(sysctl -n hw.ncpu)
     popd
 
-    rm -f build/macos/libsrt-lipo.a
-    cp build/macos/libsrt.a build/macos/libsrt-lipo.a
+    rm -f build/macos_catalyst/libsrt-lipo.a
+    cp build/macos_catalyst/libsrt.a build/macos_catalyst/libsrt-lipo.a
     libtool \
         -static \
-        -o build/macos/libsrt.a \
-        build/macos/libsrt-lipo.a \
+        -o build/macos_catalyst/libsrt.a \
+        build/macos_catalyst/libsrt-lipo.a \
         OpenSSL/macosx/lib/libcrypto.a \
         OpenSSL/macosx/lib/libssl.a
 }
@@ -90,7 +91,7 @@ EOF
     xcodebuild -create-xcframework \
         -library build/SIMULATOR64/libsrt.a -headers Includes \
         -library build/OS/libsrt.a -headers Includes \
-        -library build/macos/libsrt.a -headers Includes \
+        -library build/macos_catalyst/libsrt.a -headers Includes \
         -output libsrt.xcframework
 
     zip -r libsrt.xcframework.zip libsrt.xcframework
