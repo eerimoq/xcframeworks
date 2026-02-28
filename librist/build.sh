@@ -19,6 +19,7 @@ function clone_and_patch() {
 
 function build() {
     rm -rf build
+
     mkdir -p build/iphone
     pushd build/iphone
     meson setup ../../librist \
@@ -30,6 +31,7 @@ function build() {
           --cross-file ../../iphone.txt
     ninja
     popd
+
     mkdir -p build/iossimulator
     pushd build/iossimulator
     meson setup ../../librist \
@@ -39,6 +41,18 @@ function build() {
           -D test=false \
           -D built_tools=false \
           --cross-file ../../iossimulator.txt
+    ninja
+    popd
+
+    mkdir -p build/macos_arm64
+    pushd build/macos_arm64
+    meson setup ../../librist \
+          --default-library=static \
+          --buildtype=release \
+          -D builtin_mbedtls=true \
+          -D test=false \
+          -D built_tools=false \
+          --cross-file ../../macos_arm64.txt
     ninja
     popd
 }
@@ -54,6 +68,8 @@ function create_xcframework() {
         -library build/iphone/librist.a \
         -headers include \
         -library build/iossimulator/librist.a \
+        -headers include \
+        -library build/macos_arm64/librist.a \
         -headers include \
         -output librist.xcframework
     zip -r librist.xcframework.zip librist.xcframework
