@@ -25,50 +25,33 @@ function clone_and_patch() {
     fi
 }
 
+function build_platform() {
+    export OPENSSL_ROOT_DIR=$(pwd)/OpenSSL/$1
+    BUILD=build/$1
+    cmake libdatachannel \
+      -B $BUILD \
+      -D CMAKE_BUILD_TYPE=Release \
+      -D CMAKE_TOOLCHAIN_FILE=../ios-cmake/ios.toolchain.cmake \
+      -D PLATFORM=$2 \
+      -D BUILD_SHARED_LIBS=OFF \
+      -D BUILD_SHARED_DEPS_LIBS=OFF \
+      -D NO_WEBSOCKET=YES \
+      -D NO_EXAMPLES=YES \
+      -D NO_TESTS=YES
+    make -C $BUILD -j $(nproc)
+    libtool -static -o $BUILD/libdatachannel.a \
+      $BUILD/libdatachannel.a \
+      $BUILD/deps/libsrtp/libsrtp2.a \
+      $BUILD/deps/usrsctp/usrsctplib/libusrsctp.a \
+      $BUILD/deps/libjuice/libjuice.a \
+      $OPENSSL_ROOT_DIR/lib/*.a
+}
+
 function build() {
-    export OPENSSL_ROOT_DIR=$(pwd)/OpenSSL/iphoneos
-    BUILD=build/iphoneos
-    
-    cmake libdatachannel \
-      -B $BUILD \
-      -G Xcode \
-      -DCMAKE_TOOLCHAIN_FILE=../ios-cmake/ios.toolchain.cmake \
-      -DPLATFORM=OS64 \
-      -DBUILD_SHARED_LIBS=OFF \
-      -DBUILD_SHARED_DEPS_LIBS=OFF \
-      -DNO_WEBSOCKET=YES \
-      -DNO_EXAMPLES=YES \
-      -DNO_TESTS=YES
-    cmake --build $BUILD --config Release
-    
-    libtool -static -o $BUILD/libdatachannel.a \
-      $BUILD/Release-iphoneos/libdatachannel.a \
-      $BUILD/deps/libsrtp/Release-iphoneos/libsrtp2.a \
-      $BUILD/deps/usrsctp/usrsctplib/Release-iphoneos/libusrsctp.a \
-      $BUILD/deps/libjuice/Release-iphoneos/libjuice.a \
-      $OPENSSL_ROOT_DIR/lib/*.a
-    
-    export OPENSSL_ROOT_DIR=$(pwd)/OpenSSL/iphonesimulator
-    BUILD=build/iphonesimulator
-    
-    cmake libdatachannel \
-      -B $BUILD \
-      -G Xcode \
-      -DCMAKE_TOOLCHAIN_FILE=../ios-cmake/ios.toolchain.cmake \
-      -DPLATFORM=SIMULATORARM64 \
-      -DBUILD_SHARED_LIBS=OFF \
-      -DBUILD_SHARED_DEPS_LIBS=OFF \
-      -DNO_WEBSOCKET=YES \
-      -DNO_EXAMPLES=YES \
-      -DNO_TESTS=YES
-    cmake --build $BUILD --config Release
-    
-    libtool -static -o $BUILD/libdatachannel.a \
-      $BUILD/Release-iphonesimulator/libdatachannel.a \
-      $BUILD/deps/libsrtp/Release-iphonesimulator/libsrtp2.a \
-      $BUILD/deps/usrsctp/usrsctplib/Release-iphonesimulator/libusrsctp.a \
-      $BUILD/deps/libjuice/Release-iphonesimulator/libjuice.a \
-      $OPENSSL_ROOT_DIR/lib/*.a
+    rm -rf build
+    build_platform iphoneos OS64
+    build_platform iphonesimulator SIMULATORARM64
+    build_platform macosx_catalyst MAC_CATALYST_ARM64
 }
 
 function create_xcframework() {
@@ -76,13 +59,14 @@ function create_xcframework() {
     mkdir -p include/libdatachannel
     cp -r libdatachannel/include/rtc include/libdatachannel
     cp module.modulemap include/libdatachannel/module.modulemap
-    
+
     rm -rf libdatachannel.xcframework
     xcodebuild -create-xcframework  \
         -library ./build/iphoneos/libdatachannel.a -headers include  \
         -library ./build/iphonesimulator/libdatachannel.a -headers include  \
+        -library ./build/macosx_catalyst/libdatachannel.a -headers include  \
         -output libdatachannel.xcframework
-    
+
     zip -r libdatachannel.xcframework.zip libdatachannel.xcframework
     swift package compute-checksum libdatachannel.xcframework.zip
 }
