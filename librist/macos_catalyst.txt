@@ -1,6 +1,6 @@
-# This is a cross compilation file from OSX Yosemite to macOS.
-# Apple keeps changing the location and names of files so
-# these might not work for you. Use the googles and xcrun.
+# Cross-compilation file for ARM64 macOS builds targeting macOS 11.0+.
+# This remains a native macOS config, kept as macos_catalyst.txt for repo target naming.
+# Apple keeps changing the location and names of files, use xcrun as needed.
 
 [binaries]
 c = ['clang', '-arch', 'arm64', '-isysroot', '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk']
