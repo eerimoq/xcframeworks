@@ -15,11 +15,9 @@ function clone_and_patch() {
       git apply ../../../libsrtp.patch
       popd
     fi
-    
     if [ ! -d OpenSSL ] ; then
       git clone --depth 1 --branch 3.3.3001 https://github.com/krzyzanowskim/OpenSSL
     fi
-    
     if [ ! -d ios-cmake ] ; then
       git clone --depth 1 --branch 4.5.0 https://github.com/leetal/ios-cmake
     fi

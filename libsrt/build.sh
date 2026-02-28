@@ -9,90 +9,50 @@ function clone_and_patch() {
     if [ ! -d srt ] ; then
         git clone --depth 1 --branch moblin-0.1.0 https://github.com/eerimoq/srt
     fi
+    if [ ! -d ios-cmake ] ; then
+      git clone --depth 1 --branch 4.5.0 https://github.com/leetal/ios-cmake
+    fi
 }
 
-function build_srt() {
+function build_platform() {
     export OPENSSL_ROOT_DIR=$(pwd)/OpenSSL/$1
-    IOS_OPENSSL=$(pwd)/OpenSSL/$1
-    mkdir -p build/$2/$3
-    pushd build/$2/$3
-    CC=clang CXX=clang++ ../../../srt/configure \
-        --cmake-prefix-path=$IOS_OPENSSL \
-        --cmake-policy-version-minimum=3.5 \
-        --cmake-make-program=make \
-        --ios-disable-bitcode=1 \
-        --ios-platform=$2 \
-        --ios-arch=$3 \
-        --cmake-toolchain-file=scripts/iOS.cmake \
-        --USE_OPENSSL_PC=off \
-        --enable-maxrexmitbw=ON \
-        --enable-apps=OFF \
-        --enable-logging=OFF \
-        --enable-shared=OFF
-    make -j $(sysctl -n hw.ncpu)
-    popd
-
-    rm -f build/$2/libsrt-lipo.a
-    lipo \
-        -create build/$2/arm64/libsrt.a \
-        -output build/$2/libsrt-lipo.a
-    libtool \
-        -static \
-        -o build/$2/libsrt.a \
-        build/$2/libsrt-lipo.a \
-        OpenSSL/$1/lib/libcrypto.a \
-        OpenSSL/$1/lib/libssl.a
+    BUILD=build/$1
+    cmake srt \
+      -B $BUILD \
+      -D CMAKE_POLICY_VERSION_MINIMUM=3.5 \
+      -D ENABLE_APPS=OFF \
+      -D ENABLE_SHARED=OFF \
+      -D ENABLE_MAXREXMITBW=ON \
+      -D ENABLE_LOGGING=OFF \
+      -D CMAKE_BUILD_TYPE=Release \
+      -D CMAKE_TOOLCHAIN_FILE=../ios-cmake/ios.toolchain.cmake \
+      -D PLATFORM=$2
+    make -C $BUILD -j $(nproc)
 }
 
 function build() {
     rm -rf build
-
-    export IPHONEOS_DEPLOYMENT_TARGET=16.4
-    build_srt iphonesimulator SIMULATOR64 arm64
-    build_srt iphoneos OS arm64
-
-    export MACOSX_DEPLOYMENT_TARGET=10.15
-    MACOS_OPENSSL=$(pwd)/OpenSSL/macosx
-    mkdir -p build/macos
-    pushd build/macos
-    ../../srt/configure \
-        --cmake-osx-architectures=arm64 \
-        --cmake-policy-version-minimum=3.5 \
-        --OPENSSL_INCLUDE_DIR=$MACOS_OPENSSL/include \
-        --OPENSSL_LIBRARIES=$MACOS_OPENSSL/lib/libcrypto.a
-    make -j $(sysctl -n hw.ncpu)
-    popd
-
-    rm -f build/macos/libsrt-lipo.a
-    cp build/macos/libsrt.a build/macos/libsrt-lipo.a
-    libtool \
-        -static \
-        -o build/macos/libsrt.a \
-        build/macos/libsrt-lipo.a \
-        OpenSSL/macosx/lib/libcrypto.a \
-        OpenSSL/macosx/lib/libssl.a
+    build_platform iphoneos OS64
+    build_platform iphonesimulator SIMULATORARM64
+    build_platform macosx_catalyst MAC_CATALYST_ARM64
 }
 
 function create_xcframework() {
-    rm -rf Includes
-    mkdir -p Includes
-    cp srt/srtcore/{logging_api,platform_sys,srt}.h Includes
-    cp build/OS/arm64/version.h Includes/version.h
-    cat <<EOF > Includes/module.modulemap
-module libsrt {
-    header "srt.h"
-    export *
-}
-EOF
-    echo "#define ENABLE_MAXREXMITBW 1" >> Includes/platform_sys.h
-
+    rm -rf include
+    mkdir -p include
+    cp srt/srtcore/{logging_api,platform_sys,srt}.h include
+    cp build/iphoneos/version.h include/version.h
+    cp module.modulemap include/module.modulemap
+    echo "#define ENABLE_MAXREXMITBW 1" >> include/platform_sys.h
     rm -rf libsrt.xcframework
     xcodebuild -create-xcframework \
-        -library build/SIMULATOR64/libsrt.a -headers Includes \
-        -library build/OS/libsrt.a -headers Includes \
-        -library build/macos/libsrt.a -headers Includes \
+        -library build/iphoneos/libsrt.a \
+        -headers include \
+        -library build/iphonesimulator/libsrt.a \
+        -headers include \
+        -library build/macosx_catalyst/libsrt.a \
+        -headers include \
         -output libsrt.xcframework
-
     zip -r libsrt.xcframework.zip libsrt.xcframework
     swift package compute-checksum libsrt.xcframework.zip
 }
