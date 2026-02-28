@@ -44,15 +44,15 @@ function build() {
     ninja
     popd
 
-    mkdir -p build/macos_arm64
-    pushd build/macos_arm64
+    mkdir -p build/macos
+    pushd build/macos
     meson setup ../../librist \
           --default-library=static \
           --buildtype=release \
           -D builtin_mbedtls=true \
           -D test=false \
           -D built_tools=false \
-          --cross-file ../../macos_arm64.txt
+          --cross-file ../../macos.txt
     ninja
     popd
 }
@@ -69,7 +69,7 @@ function create_xcframework() {
         -headers include \
         -library build/iossimulator/librist.a \
         -headers include \
-        -library build/macos_arm64/librist.a \
+        -library build/macos/librist.a \
         -headers include \
         -output librist.xcframework
     zip -r librist.xcframework.zip librist.xcframework
