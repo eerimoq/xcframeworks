@@ -31,35 +31,46 @@ function build_srt() {
         --enable-shared=OFF
     make -j $(sysctl -n hw.ncpu)
     popd
+
+    rm -f build/$2/libsrt-lipo.a
+    lipo \
+        -create build/$2/arm64/libsrt.a \
+        -output build/$2/libsrt-lipo.a
+    libtool \
+        -static \
+        -o build/$2/libsrt.a \
+        build/$2/libsrt-lipo.a \
+        OpenSSL/$1/lib/libcrypto.a \
+        OpenSSL/$1/lib/libssl.a
 }
 
 function build() {
     rm -rf build
+
     export IPHONEOS_DEPLOYMENT_TARGET=16.4
     build_srt iphonesimulator SIMULATOR64 arm64
     build_srt iphoneos OS arm64
 
-    rm -f build/SIMULATOR64/libsrt-lipo.a
-    lipo \
-        -create build/SIMULATOR64/arm64/libsrt.a \
-        -output build/SIMULATOR64/libsrt-lipo.a
-    libtool \
-        -static \
-        -o build/SIMULATOR64/libsrt.a \
-        build/SIMULATOR64/libsrt-lipo.a \
-        OpenSSL/iphonesimulator/lib/libcrypto.a \
-        OpenSSL/iphonesimulator/lib/libssl.a
+    export MACOSX_DEPLOYMENT_TARGET=10.15
+    MACOS_OPENSSL=$(pwd)/OpenSSL/macosx
+    mkdir -p build/macos
+    pushd build/macos
+    ../../srt/configure \
+        --cmake-osx-architectures=arm64 \
+        --cmake-policy-version-minimum=3.5 \
+        --OPENSSL_INCLUDE_DIR=$MACOS_OPENSSL/include \
+        --OPENSSL_LIBRARIES=$MACOS_OPENSSL/lib/libcrypto.a
+    make -j $(sysctl -n hw.ncpu)
+    popd
 
-    rm -f build/OS/libsrt-lipo.a
-    lipo \
-        -create build/OS/arm64/libsrt.a \
-        -output build/OS/libsrt-lipo.a
+    rm -f build/macos/libsrt-lipo.a
+    cp build/macos/libsrt.a build/macos/libsrt-lipo.a
     libtool \
         -static \
-        -o build/OS/libsrt.a \
-        build/OS/libsrt-lipo.a \
-        OpenSSL/iphoneos/lib/libcrypto.a \
-        OpenSSL/iphoneos/lib/libssl.a
+        -o build/macos/libsrt.a \
+        build/macos/libsrt-lipo.a \
+        OpenSSL/macosx/lib/libcrypto.a \
+        OpenSSL/macosx/lib/libssl.a
 }
 
 function create_xcframework() {
@@ -79,6 +90,7 @@ EOF
     xcodebuild -create-xcframework \
         -library build/SIMULATOR64/libsrt.a -headers Includes \
         -library build/OS/libsrt.a -headers Includes \
+        -library build/macos/libsrt.a -headers Includes \
         -output libsrt.xcframework
 
     zip -r libsrt.xcframework.zip libsrt.xcframework
