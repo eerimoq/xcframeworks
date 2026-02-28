@@ -12,6 +12,7 @@ function clone_and_patch() {
 }
 
 function build_srt() {
+    export OPENSSL_ROOT_DIR=$(pwd)/OpenSSL/$1
     IOS_OPENSSL=$(pwd)/OpenSSL/$1
     mkdir -p build/$2/$3
     pushd build/$2/$3
@@ -33,6 +34,7 @@ function build_srt() {
 }
 
 function build() {
+    rm -rf build
     export IPHONEOS_DEPLOYMENT_TARGET=16.4
     build_srt iphonesimulator SIMULATOR64 arm64
     build_srt iphoneos OS arm64
