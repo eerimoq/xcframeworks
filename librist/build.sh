@@ -28,7 +28,7 @@ function build() {
           -D builtin_mbedtls=true \
           -D test=false \
           -D built_tools=false \
-          --cross-file ../../iphone.txt
+          --cross-file ../../iphone.ini
     ninja
     popd
 
@@ -40,19 +40,19 @@ function build() {
           -D builtin_mbedtls=true \
           -D test=false \
           -D built_tools=false \
-          --cross-file ../../iossimulator.txt
+          --cross-file ../../iossimulator.ini
     ninja
     popd
 
-    mkdir -p build/macos
-    pushd build/macos
+    mkdir -p build/macos_catalyst
+    pushd build/macos_catalyst
     meson setup ../../librist \
           --default-library=static \
           --buildtype=release \
           -D builtin_mbedtls=true \
           -D test=false \
           -D built_tools=false \
-          --cross-file ../../macos.txt
+          --cross-file ../../macos_catalyst.ini
     ninja
     popd
 }
@@ -69,7 +69,7 @@ function create_xcframework() {
         -headers include \
         -library build/iossimulator/librist.a \
         -headers include \
-        -library build/macos/librist.a \
+        -library build/macos_catalyst/librist.a \
         -headers include \
         -output librist.xcframework
     zip -r librist.xcframework.zip librist.xcframework
