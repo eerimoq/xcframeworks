@@ -58,6 +58,29 @@ function build() {
         build/OS/libsrt-lipo.a \
         OpenSSL/iphoneos/lib/libcrypto.a \
         OpenSSL/iphoneos/lib/libssl.a
+
+    mkdir -p build/macos
+    pushd build/macos
+    CC=clang CXX=clang++ ../../srt/configure \
+        --cmake-prefix-path=$(pwd)/../../OpenSSL/macosx \
+        --cmake-policy-version-minimum=3.5 \
+        --cmake-make-program=make \
+        --cmake-osx-architectures=arm64\;x86_64 \
+        --use-openssl-pc=off \
+        --enable-maxrexmitbw=ON \
+        --enable-apps=OFF \
+        --enable-logging=OFF \
+        --enable-shared=OFF
+    make -j $(sysctl -n hw.ncpu)
+    popd
+    rm -f build/macos/libsrt-lipo.a
+    cp build/macos/libsrt.a build/macos/libsrt-lipo.a
+    libtool \
+        -static \
+        -o build/macos/libsrt.a \
+        build/macos/libsrt-lipo.a \
+        OpenSSL/macosx/lib/libcrypto.a \
+        OpenSSL/macosx/lib/libssl.a
 }
 
 function create_xcframework() {
@@ -77,6 +100,7 @@ EOF
     xcodebuild -create-xcframework \
         -library build/SIMULATOR64/libsrt.a -headers Includes \
         -library build/OS/libsrt.a -headers Includes \
+        -library build/macos/libsrt.a -headers Includes \
         -output libsrt.xcframework
 
     zip -r libsrt.xcframework.zip libsrt.xcframework

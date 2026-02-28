@@ -69,6 +69,28 @@ function build() {
       $BUILD/deps/usrsctp/usrsctplib/Release-iphonesimulator/libusrsctp.a \
       $BUILD/deps/libjuice/Release-iphonesimulator/libjuice.a \
       $OPENSSL_ROOT_DIR/lib/*.a
+
+    export OPENSSL_ROOT_DIR=$(pwd)/OpenSSL/macosx
+    BUILD=build/macosx
+
+    cmake libdatachannel \
+      -B $BUILD \
+      -G Xcode \
+      -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
+      -DOPENSSL_ROOT_DIR=$OPENSSL_ROOT_DIR \
+      -DBUILD_SHARED_LIBS=OFF \
+      -DBUILD_SHARED_DEPS_LIBS=OFF \
+      -DNO_WEBSOCKET=YES \
+      -DNO_EXAMPLES=YES \
+      -DNO_TESTS=YES
+    cmake --build $BUILD --config Release
+
+    libtool -static -o $BUILD/libdatachannel.a \
+      $BUILD/Release/libdatachannel.a \
+      $BUILD/deps/libsrtp/Release/libsrtp2.a \
+      $BUILD/deps/usrsctp/usrsctplib/Release/libusrsctp.a \
+      $BUILD/deps/libjuice/Release/libjuice.a \
+      $OPENSSL_ROOT_DIR/lib/*.a
 }
 
 function create_xcframework() {
@@ -81,6 +103,7 @@ function create_xcframework() {
     xcodebuild -create-xcframework  \
         -library ./build/iphoneos/libdatachannel.a -headers include  \
         -library ./build/iphonesimulator/libdatachannel.a -headers include  \
+        -library ./build/macosx/libdatachannel.a -headers include  \
         -output libdatachannel.xcframework
     
     zip -r libdatachannel.xcframework.zip libdatachannel.xcframework
