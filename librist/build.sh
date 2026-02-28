@@ -17,44 +17,25 @@ function clone_and_patch() {
     fi
 }
 
+function build_platform() {
+    mkdir -p build/$1
+    pushd build/$1
+    meson setup ../../librist \
+          --default-library=static \
+          --buildtype=release \
+          -D builtin_mbedtls=true \
+          -D test=false \
+          -D built_tools=false \
+          --cross-file ../../$1.ini
+    ninja
+    popd
+}
+
 function build() {
     rm -rf build
-
-    mkdir -p build/iphone
-    pushd build/iphone
-    meson setup ../../librist \
-          --default-library=static \
-          --buildtype=release \
-          -D builtin_mbedtls=true \
-          -D test=false \
-          -D built_tools=false \
-          --cross-file ../../iphone.ini
-    ninja
-    popd
-
-    mkdir -p build/iossimulator
-    pushd build/iossimulator
-    meson setup ../../librist \
-          --default-library=static \
-          --buildtype=release \
-          -D builtin_mbedtls=true \
-          -D test=false \
-          -D built_tools=false \
-          --cross-file ../../iossimulator.ini
-    ninja
-    popd
-
-    mkdir -p build/macos_catalyst
-    pushd build/macos_catalyst
-    meson setup ../../librist \
-          --default-library=static \
-          --buildtype=release \
-          -D builtin_mbedtls=true \
-          -D test=false \
-          -D built_tools=false \
-          --cross-file ../../macos_catalyst.ini
-    ninja
-    popd
+    build_platform iphone
+    build_platform iossimulator
+    build_platform macos_catalyst
 }
 
 function create_xcframework() {
