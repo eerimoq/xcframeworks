@@ -25,7 +25,7 @@ has_function_hfkerhisadf = false
 
 [host_machine]
 system = 'darwin'
-subsystem = 'macos_catalyst'
+subsystem = 'macos'
 kernel = 'xnu'
 cpu_family = 'aarch64'
 cpu = 'aarch64'
