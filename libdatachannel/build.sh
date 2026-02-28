@@ -85,6 +85,10 @@ function build() {
       -D NO_EXAMPLES=YES \
       -D NO_TESTS=YES
     cmake --build $BUILD --config Release
+    mkdir -p $BUILD/openssl_arm64
+    for lib in $OPENSSL_ROOT_DIR/lib/*.a; do
+        lipo -thin arm64 "$lib" -output "$BUILD/openssl_arm64/$(basename "$lib")"
+    done
     libtool \
       -static \
       -o $BUILD/libdatachannel.a \
@@ -92,7 +96,7 @@ function build() {
       $BUILD/deps/libsrtp/Release/libsrtp2.a \
       $BUILD/deps/usrsctp/usrsctplib/Release/libusrsctp.a \
       $BUILD/deps/libjuice/Release/libjuice.a \
-      $OPENSSL_ROOT_DIR/lib/*.a
+      $BUILD/openssl_arm64/*.a
 }
 
 function create_xcframework() {
