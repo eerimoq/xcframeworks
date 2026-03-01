@@ -10,7 +10,7 @@ function clone_and_patch() {
         git clone --depth 1 --branch moblin-0.1.0 https://github.com/eerimoq/srt
     fi
     if [ ! -d ios-cmake ] ; then
-      git clone --depth 1 --branch 4.5.0 https://github.com/leetal/ios-cmake
+      git clone --depth 1 https://github.com/eerimoq/ios-cmake
     fi
 }
 
@@ -34,7 +34,7 @@ function build() {
     rm -rf build
     build_platform iphoneos OS64
     build_platform iphonesimulator SIMULATORARM64
-    build_platform macosx_catalyst MAC_CATALYST_ARM64
+    build_platform macosx_catalyst MAC_CATALYST_UNIVERSAL
 }
 
 function create_xcframework() {
