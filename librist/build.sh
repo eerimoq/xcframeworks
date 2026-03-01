@@ -36,6 +36,12 @@ function build() {
     build_platform iphone
     build_platform iossimulator
     build_platform macos_catalyst
+    build_platform macos_catalyst_x86_64
+    lipo \
+        -create \
+        -output build/librist.a \
+        build/macos_catalyst/librist.a \
+        build/macos_catalyst_x86_64/librist.a
 }
 
 function create_xcframework() {
@@ -50,7 +56,7 @@ function create_xcframework() {
         -headers include \
         -library build/iossimulator/librist.a \
         -headers include \
-        -library build/macos_catalyst/librist.a \
+        -library build/librist.a \
         -headers include \
         -output librist.xcframework
     zip -r librist.xcframework.zip librist.xcframework
