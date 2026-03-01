@@ -39,19 +39,16 @@ function build() {
 
 function create_xcframework() {
     rm -rf include
-    mkdir -p include
+    mkdir include
     cp srt/srtcore/{logging_api,platform_sys,srt}.h include
     cp build/iphoneos/version.h include/version.h
     cp module.modulemap include/module.modulemap
     echo "#define ENABLE_MAXREXMITBW 1" >> include/platform_sys.h
     rm -rf libsrt.xcframework
     xcodebuild -create-xcframework \
-        -library build/iphoneos/libsrt.a \
-        -headers include \
-        -library build/iphonesimulator/libsrt.a \
-        -headers include \
-        -library build/macosx_catalyst/libsrt.a \
-        -headers include \
+        -library build/iphoneos/libsrt.a -headers include \
+        -library build/iphonesimulator/libsrt.a -headers include \
+        -library build/macosx_catalyst/libsrt.a -headers include \
         -output libsrt.xcframework
     zip -r libsrt.xcframework.zip libsrt.xcframework
 }

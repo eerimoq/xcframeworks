@@ -26,7 +26,7 @@ function build_platform() {
           -D builtin_mbedtls=true \
           -D test=false \
           -D built_tools=false \
-          --cross-file ../../$1.ini
+          --cross-file ../../cross/$1.ini
     ninja
     popd
 }
@@ -52,12 +52,9 @@ function create_xcframework() {
     rm -rf librist.xcframework
     xcodebuild \
         -create-xcframework \
-        -library build/iphone/librist.a \
-        -headers include \
-        -library build/iossimulator/librist.a \
-        -headers include \
-        -library build/librist.a \
-        -headers include \
+        -library build/iphone/librist.a -headers include \
+        -library build/iossimulator/librist.a -headers include \
+        -library build/librist.a -headers include \
         -output librist.xcframework
     zip -r librist.xcframework.zip librist.xcframework
 }

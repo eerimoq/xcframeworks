@@ -1,15 +1,12 @@
 build
 include
 librist/build
-librist/include
 librist/librist
 libdatachannel/build
-libdatachannel/include
 libdatachannel/libdatachannel
 *.xcframework
 *.xcframework.zip
 ios-cmake
 OpenSSL
-libsrt/include
 libsrt/srt
 .swiftpm
