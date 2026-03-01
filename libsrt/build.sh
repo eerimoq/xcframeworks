@@ -54,7 +54,6 @@ function create_xcframework() {
         -headers include \
         -output libsrt.xcframework
     zip -r libsrt.xcframework.zip libsrt.xcframework
-    swift package compute-checksum libsrt.xcframework.zip
 }
 
 clone_and_patch

@@ -57,16 +57,13 @@ function create_xcframework() {
     mkdir -p include/libdatachannel
     cp -r libdatachannel/include/rtc include/libdatachannel
     cp module.modulemap include/libdatachannel/module.modulemap
-
     rm -rf libdatachannel.xcframework
     xcodebuild -create-xcframework  \
         -library ./build/iphoneos/libdatachannel.a -headers include  \
         -library ./build/iphonesimulator/libdatachannel.a -headers include  \
         -library ./build/macosx_catalyst/libdatachannel.a -headers include  \
         -output libdatachannel.xcframework
-
     zip -r libdatachannel.xcframework.zip libdatachannel.xcframework
-    swift package compute-checksum libdatachannel.xcframework.zip
 }
 
 clone_and_patch

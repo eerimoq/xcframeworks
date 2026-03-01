@@ -60,7 +60,6 @@ function create_xcframework() {
         -headers include \
         -output librist.xcframework
     zip -r librist.xcframework.zip librist.xcframework
-    swift package compute-checksum librist.xcframework.zip
 }
 
 clone_and_patch
