@@ -10,7 +10,7 @@ set -euo pipefail
 
 function clone_and_patch() {
     if [ ! -d libdatachannel ] ; then
-      git clone --depth 1 --branch v0.27.0 --recurse-submodules https://github.com/eerimoq/libdatachannel
+      git clone --depth 1 --branch v0.28.0 --recurse-submodules https://github.com/eerimoq/libdatachannel
       pushd libdatachannel/deps/libsrtp
       git apply ../../../libsrtp.patch
       popd
