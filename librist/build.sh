@@ -12,7 +12,7 @@ function clone_and_patch() {
     if [ ! -d librist ] ; then
         git clone https://github.com/eerimoq/librist
         pushd librist
-        git checkout a29aed54e4dc32fda108977b309c3df5b91148d5
+        git checkout b0806c8a68233cdeaaec96ee31992bd928854eb5
         popd
     fi
 }
