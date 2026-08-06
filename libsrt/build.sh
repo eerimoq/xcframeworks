@@ -7,7 +7,7 @@ function clone_and_patch() {
         git clone --depth 1 --branch 3.3.3001 https://github.com/krzyzanowskim/OpenSSL
     fi
     if [ ! -d srt ] ; then
-        git clone --depth 1 --branch moblin-0.1.0 https://github.com/eerimoq/srt
+        git clone --depth 1 --branch moblin-0.2.0 https://github.com/eerimoq/srt
     fi
     if [ ! -d ios-cmake ] ; then
       git clone --depth 1 https://github.com/eerimoq/ios-cmake
