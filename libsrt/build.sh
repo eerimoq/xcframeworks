@@ -7,7 +7,7 @@ function clone_and_patch() {
         git clone --depth 1 --branch 3.3.3001 https://github.com/krzyzanowskim/OpenSSL
     fi
     if [ ! -d srt ] ; then
-        git clone --depth 1 --branch moblin-0.2.0 https://github.com/eerimoq/srt
+        git clone --depth 1 --branch moblin-0.3.0 https://github.com/eerimoq/srt
     fi
     if [ ! -d ios-cmake ] ; then
       git clone --depth 1 https://github.com/eerimoq/ios-cmake
@@ -23,6 +23,7 @@ function build_platform() {
       -D ENABLE_APPS=OFF \
       -D ENABLE_SHARED=OFF \
       -D ENABLE_MAXREXMITBW=ON \
+      -D ENABLE_PKTINFO=ON \
       -D ENABLE_LOGGING=OFF \
       -D CMAKE_BUILD_TYPE=Release \
       -D CMAKE_TOOLCHAIN_FILE=../ios-cmake/ios.toolchain.cmake \
