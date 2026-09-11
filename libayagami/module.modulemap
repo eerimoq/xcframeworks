@@ -1,0 +1,4 @@
+module libayagami {
+    header "ayagami.h"
+    export *
+}

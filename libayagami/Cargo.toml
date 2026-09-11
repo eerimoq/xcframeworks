@@ -1,0 +1,19 @@
+[package]
+name = "ayagami-ffi"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+name = "ayagami_ffi"
+crate-type = ["staticlib"]
+
+[dependencies]
+ayagami = { git = "https://github.com/AyagamiDev/ayagami", rev = "fd9a9e5285630c29cd5d0a2424af829bffbbbd33" }
+serde_json = "1"
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

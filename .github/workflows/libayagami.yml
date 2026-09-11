@@ -1,0 +1,28 @@
+name: Release libayagami
+
+on:
+  push:
+    tags:
+      - 'libayagami-*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: rustup toolchain install stable --profile minimal
+
+      - name: Build xcframework
+        working-directory: libayagami
+        run: ./build.sh
+
+      - name: Upload xcframework to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: libayagami/libayagami.xcframework.zip
