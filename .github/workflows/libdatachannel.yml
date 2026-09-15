@@ -13,13 +13,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Build xcframework
         working-directory: libdatachannel
         run: ./build.sh
 
       - name: Upload xcframework to GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: libdatachannel/libdatachannel.xcframework.zip
