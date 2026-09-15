@@ -64,7 +64,7 @@ dependencies = [
 [[package]]
 name = "ayagami"
 version = "0.1.0"
-source = "git+https://github.com/AyagamiDev/ayagami?rev=fd9a9e5285630c29cd5d0a2424af829bffbbbd33#fd9a9e5285630c29cd5d0a2424af829bffbbbd33"
+source = "git+https://github.com/AyagamiDev/ayagami?rev=0d1d7aa3efe57b1b363b72e672e353c52a9c15d6#0d1d7aa3efe57b1b363b72e672e353c52a9c15d6"
 dependencies = [
  "byteorder",
  "derive_more",
@@ -84,7 +84,7 @@ dependencies = [
 
 [[package]]
 name = "ayagami-ffi"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "ayagami",
  "serde_json",
