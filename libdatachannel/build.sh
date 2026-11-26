@@ -10,7 +10,7 @@ set -euo pipefail
 
 function clone_and_patch() {
     if [ ! -d libdatachannel ] ; then
-      git clone --depth 1 --branch moblin-0.31.0 --recurse-submodules https://github.com/eerimoq/libdatachannel
+      git clone --depth 1 --revision b8f46d97769e0081b1739d9dd50ccd71dc745d8c --recurse-submodules https://github.com/paullouisageneau/libdatachannel
       pushd libdatachannel/deps/libsrtp
       git apply ../../../libsrtp.patch
       popd
