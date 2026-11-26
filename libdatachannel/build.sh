@@ -31,6 +31,7 @@ function build_platform() {
       -D CMAKE_BUILD_TYPE=Release \
       -D CMAKE_TOOLCHAIN_FILE=../ios-cmake/ios.toolchain.cmake \
       -D PLATFORM=$2 \
+      -D DEPLOYMENT_TARGET=16.4 \
       -D BUILD_SHARED_LIBS=OFF \
       -D BUILD_SHARED_DEPS_LIBS=OFF \
       -D NO_WEBSOCKET=YES \
